@@ -1,0 +1,80 @@
+import { useCallback, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+
+// icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
+// providers
+import { queryClient, useHorizonApiClient } from "providers/Api";
+import { useNotification } from "providers/Notification";
+
+// utils
+import { ReactQueryKeys } from "utils";
+
+// types
+import { GameBuildingDto } from "lib";
+import { UseEnqueueActionProps, UseEnqueueActionResult } from "./types";
+
+/**
+ * @param props - hook props
+ * @returns the enqueue action builder
+ */
+export const useEnqueueAction = (props: UseEnqueueActionProps): UseEnqueueActionResult => {
+  const { t } = useTranslation();
+
+  const { userId, buildingAction, icon, aria, tooltip } = props;
+
+  const { setNotification } = useNotification();
+
+  const horizonApiClient = useHorizonApiClient();
+
+  const mutateFn = useMutation({
+    mutationFn: ({ buildingId }: { buildingId: number }) =>
+      horizonApiClient.Building.enqueue({
+        playerId: Number(userId),
+        buildingId,
+        action: buildingAction,
+      }),
+    onSuccess: async (result) => {
+      const { error } = result;
+      if (error) {
+        console.log(error);
+        if (error.status === 500)
+          setNotification(t(`_accessibility:messages.${error.status}`), {}, "bad");
+        else setNotification(t(`_game:buildings.notifications.${error.status}`), {}, "bad");
+      } else {
+        await queryClient.invalidateQueries({ queryKey: [ReactQueryKeys.Buildings, userId] });
+        await queryClient.invalidateQueries({ queryKey: [ReactQueryKeys.BuildingsQueue, userId] });
+      }
+    },
+    onError: async (error) => {
+      console.error(error);
+    },
+  });
+
+  const [itemId, setItemId] = useState<number | null>(null);
+
+  const action = useCallback(
+    (row: GameBuildingDto, hidden?: boolean) => {
+      const isLoading = itemId === row.id && mutateFn.isPending;
+      return {
+        id: buildingAction,
+        onClick: () => {
+          setItemId(row.id);
+          mutateFn.mutate({ buildingId: row.id });
+        },
+        hidden,
+        icon: (
+          <FontAwesomeIcon className="text-xl text-light-primary" icon={isLoading ? faSpinner : icon} />
+        ),
+        tooltip,
+        aria,
+      };
+    },
+    [itemId, mutateFn, buildingAction, icon, tooltip, aria],
+  );
+
+  return { action };
+};
