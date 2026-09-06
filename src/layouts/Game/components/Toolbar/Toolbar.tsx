@@ -5,17 +5,17 @@ import { useTranslation } from "react-i18next";
 import Action from "./ToolbarAction";
 
 // images
-import buildings from "assets/images/buildings.png";
-import guns from "assets/images/guns.png";
-import researches from "assets/images/researches.png";
-import ships from "assets/images/ships.png";
+import edificios from "assets/images/edificios.png";
+import armeria from "assets/images/armeria.png";
+import investigacion from "assets/images/investigacion.png";
+import flota from "assets/images/flota.png";
 
 // types
 import { PanelId } from "providers/ActionPanel";
 import { ToolbarActionProps } from "./types";
 
 const actions: PanelId[] = ["buildings", "ships", "techs", "guns"];
-const images = [buildings, ships, researches, guns];
+const images = [edificios, flota, investigacion, armeria];
 
 /**
  * Toolbar

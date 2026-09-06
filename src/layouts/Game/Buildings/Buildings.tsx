@@ -149,7 +149,7 @@ function Buildings() {
       <Tabs
         currentTab={currentTab}
         onChange={(_, value) => setCurrentTab(value)}
-        tabs={buildingTypes.map(({ id, name, image }) => ({ id, name, image }))}
+        tabs={buildingTypes.map(({ id, name }) => ({ id, name }))}
       />
       <ul className="flex flex-col gap-5 mt-5">
         {buildings

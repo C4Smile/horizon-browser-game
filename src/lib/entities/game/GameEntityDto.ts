@@ -20,10 +20,10 @@ export type GameBuildingDto = {
   typeId: number;
 };
 
+/** A type is only a name here: the tab that shows it renders text. */
 export type GameBuildingTypeDto = {
   id: number;
   name: string;
-  image: string;
 };
 
 export type GameCannonDto = {
