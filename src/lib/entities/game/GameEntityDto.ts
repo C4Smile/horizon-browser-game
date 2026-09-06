@@ -59,10 +59,10 @@ export type GameTechDto = {
   creationTime: number;
 };
 
+/** A type is only a name here: nothing in the game draws a picture for one. */
 export type GameTechTypeDto = {
   id: number;
   name: string;
-  image: string;
 };
 
 export type GameResourceRelationshipDto = {
